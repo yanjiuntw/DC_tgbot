@@ -35,7 +35,7 @@ bot.onText(/\/echo (.+)/, (msg, match) => {
 });
 
 // console log all get message
-bot.on('message', (msg) => {
+bot.on('message', async function (msg) {
     const chatId = msg.chat.id;
     const username = msg.chat.username;
     const date = new Date();
@@ -52,11 +52,10 @@ bot.on('message', (msg) => {
         max_photo = msg.photo.pop();
         file_unique_id = max_photo.file_unique_id;
         file_id = max_photo.file_id;
-        file_path = getpath(token, file_id);
-        console.log('path:'+file_path);
+        file_path = await getpath(token, file_id);
+        console.log('path: ' + file_path);
         getfile(token, file_path, file_unique_id);
         str = base_str + 'Send photo (' + file_unique_id + '.jpg)';
-
         console.log(str);
         log_str(str);
     }
@@ -68,18 +67,28 @@ bot.onText(/韋勳|肥|胖|宅/, (msg, match) => {
     bot.sendMessage(chatId, '肥宅韋勳');
 });
 
+bot.onText(/你才|證據|乾 /, (msg, match) => {
+    const chatId = msg.chat.id;
+    const path = `./AQADea4xG0mj0FZ-.jpg`;
+    //const stream = fs.createReadStream(path);
+    bot.sendPhoto(chatId, path);
+});
+
 // functions
 function getpath(token, fileid) {
     url = 'https://api.telegram.org/bot' + token;
     url += '/getFile?file_id=' + fileid;
     let file_path;
-    request(url, { json: true }, (err, res, body) => {
-        if (err) { return console.log(err); }
-        file_path = body.result.file_path;
-        console.log(file_path);
+    return new Promise(function (resolve, reject) {
+        request(url, { json: true }, (err, res, body) => {
+            if (!err && res.statusCode == 200) {
+                console.log(body);
+                resolve(body.result.file_path);
+            } else {
+                reject(err);
+            }
+        });
     });
-    console.log('finish');
-    return file_path;
 }
 function download(uri, filename, callback) {
     request.head(uri, function(err, res, body){
