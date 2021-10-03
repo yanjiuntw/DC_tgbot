@@ -16,7 +16,7 @@ $ npm install
 node index.js
 ```
 
-* After setup your telegram bot token ([How to get your token](https://core.telegram.org/bots)
+* After setup your telegram bot token ([How to get your token](https://core.telegram.org/bots))
 * The chat ID is optional, you can setup if need
 
 ```bash
