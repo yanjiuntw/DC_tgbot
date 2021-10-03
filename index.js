@@ -9,12 +9,23 @@ function log_str(str) {
 const TelegramBot = require('node-telegram-bot-api');
 const token = process.env.TELEGRAM_TOKEN || 'YOUR_TOKEN';
 const bot = new TelegramBot(token, {polling: true});
-const myID = process.env.TELEGRAM_MYID || 'YOUR_CHAT_ID';
+var myID = process.env.TELEGRAM_MYID || 'YOUR_CHAT_ID';
+var running = 0;
 
-// template
+// start main
 bot.onText(/\/start$/, (msg, match) => {
     const chatId = msg.chat.id;
-    bot.sendMessage(chatId, 'Hello world');
+    myID = chatId;
+    running = 1;
+    send_msg(myID, 'Successfully setup your chat ID');
+    send_msg(myID, 'Start main job');
+});
+
+// stop main
+bot.onText(/\/stop$/, (msg, match) => {
+    const chatId = msg.chat.id;
+    running = 0;
+    send_msg(myID, 'Stop main job');
 });
 
 // regex template
@@ -88,3 +99,27 @@ function getfile(token, path, hash) {
         console.log('getfile: Download done');
     });
 }
+function sleep(ms) {
+    return new Promise((resolve) => {
+        setTimeout(resolve, ms);
+    });
+}
+function send_msg(id, str) {
+    const date = new Date();
+    const time = date.toLocaleString();
+    const base_str = time + ' ID:' + id + '=> ' + 'reply' + ': ';
+    bot.sendMessage(id, str);
+    console.log(base_str+str);
+    log_str(base_str+str);
+}
+
+// loop
+async function main () {
+    while (1) {
+        await sleep(10*1000);
+        if (running) {
+            send_msg(myID, 'Loop message test');
+        }
+    }
+}
+main();
