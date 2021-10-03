@@ -1,0 +1,4 @@
+*.jpg
+*.log
+node_modules
+run.sh
