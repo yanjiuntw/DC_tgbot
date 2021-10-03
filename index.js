@@ -2,9 +2,7 @@ const fs = require('fs');
 const util = require('util');
 const request = require('request');
 const log_file =fs.createWriteStream('debug.log', {flags: 'a+'});
-function log_str(str) {
-    log_file.write(util.format(str) + "\n");
-}
+const CronJob = require('cron').CronJob;
 
 const TelegramBot = require('node-telegram-bot-api');
 const token = process.env.TELEGRAM_TOKEN || 'YOUR_TOKEN';
@@ -112,14 +110,26 @@ function send_msg(id, str) {
     console.log(base_str+str);
     log_str(base_str+str);
 }
+function log_str(str) {
+    log_file.write(util.format(str) + "\n");
+}
 
-// loop
-async function main () {
-    while (1) {
-        await sleep(10*1000);
+// Cron Job
+var job = new CronJob(
+    '0 * * * * *',
+    function () {
         if (running) {
             send_msg(myID, 'Loop message test');
         }
     }
-}
-main();
+);
+job.start();
+//async function main () {
+//    while (1) {
+//        await sleep(10*1000);
+//        if (running) {
+//            send_msg(myID, 'Loop message test');
+//        }
+//    }
+//}
+//main();
